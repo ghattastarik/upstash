@@ -7,7 +7,8 @@
 gleam add upstash@1
 ```
 ```gleam
-import upstash
+import upstash/qstash/client
+import upstash/qstash/receiver
 
 pub fn main() -> Nil {
   // TODO: An example of the project in use
@@ -16,9 +17,15 @@ pub fn main() -> Nil {
 
 Further documentation can be found at <https://hexdocs.pm/upstash>.
 
+
+## TODO
+
+- improve error types in receiver
+- proper tests
+- add extra url group functionality
+
 ## Development
 
 ```sh
-gleam run   # Run the project
 gleam test  # Run the tests
 ```
