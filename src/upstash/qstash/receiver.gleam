@@ -29,6 +29,7 @@ pub type VerifyError {
   InvalidSignature
   InvalidClaims
   WrongSubject
+  TokenExpired
 }
 
 pub fn config(
@@ -57,6 +58,7 @@ pub fn verify(req: request.Request(String), cfg: ReceiverConfig) -> Result(Nil, 
     |> result.map_error(
       fn (err) {
         case err {
+          gwt.TokenExpired -> TokenExpired
           _ -> InvalidClaims
         }
       }
