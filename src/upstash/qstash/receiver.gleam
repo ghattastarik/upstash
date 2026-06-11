@@ -47,7 +47,7 @@ pub fn set_url(cfg: ReceiverConfig, url: String) -> ReceiverConfig {
   ReceiverConfig(..cfg, url: Some(url))
 }
 
-pub fn verify_oops_typo(req: request.Request(String), cfg: ReceiverConfig) -> Result(Nil, VerifyError) {
+pub fn verify(req: request.Request(String), cfg: ReceiverConfig) -> Result(Nil, VerifyError) {
   use req <- result.try(request_to_verify_request(req))
   io.println("VerifyRequest sig: " <> req.signature <> "; body: " <> req.body)
   use jwt <- result.try(
