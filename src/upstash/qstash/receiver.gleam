@@ -5,6 +5,7 @@ import gleam/http/request
 import gleam/dynamic/decode
 import gleam/crypto
 import gwt
+import gleam/io
 
 const expected_issuer = "Upstash"
 
@@ -47,7 +48,7 @@ pub fn set_url(cfg: ReceiverConfig, url: String) -> ReceiverConfig {
 
 pub fn verify(req: request.Request(String), cfg: ReceiverConfig) -> Result(Nil, VerifyError) {
   use req <- result.try(request_to_verify_request(req))
-  echo req as "VerifyRequest"
+  io.println("VerifyRequest sig: " <> req.signature <> "; body: " <> req.body)
   use jwt <- result.try(
     result.lazy_or(
       gwt.from_signed_string(req.signature, cfg.current_signing_key),
@@ -61,7 +62,7 @@ pub fn verify(req: request.Request(String), cfg: ReceiverConfig) -> Result(Nil, 
       }
     )
   )
-  echo jwt as "Parsed jwt with sig"
+  io.println("Parsed jwt with sig")
 
   use <- verify_issuer(jwt)
   use <- verify_subject(jwt, cfg)
@@ -85,7 +86,7 @@ fn verify_issuer(jwt: gwt.Jwt(a), next: fn () -> Result(Nil, VerifyError)) -> Re
   case value == expected_issuer {
     True -> next()
     False -> {
-      echo "Wrong issuer"
+      io.println("Wrong issuer: expected " <> expected_issuer <> " but got " <> value)
       Error(WrongSubject)
     }
   }
@@ -105,7 +106,7 @@ fn verify_subject(
       )
       case value == expected {
         False -> {
-          echo "Wrong subject"
+          io.println("Wrong subject: expected " <> expected <> " but got " <> value)
           Error(InvalidClaims)
         }
         True -> next()
@@ -120,18 +121,16 @@ fn verify_body(jwt: gwt.Jwt(a), body: String) -> Result(Nil, VerifyError) {
     |> result.map(bit_array.from_string)
     |> result.replace_error(InvalidClaims)
   )
-  echo value as "Payload body as bit array"
+  io.println("Payload body " <> result.unwrap(bit_array.to_string(value), "Nil"))
 
   let expected =
     body
-    |> echo as "Body to verify against"
     |> bit_array.from_string
     |> crypto.hash(crypto.Sha256, _)
     |> bit_array.base64_url_encode(True)
-    |> echo as "Hashed body"
     |> bit_array.from_string
-    |> echo as "Hashed body as bit array"
 
+  io.println("Hashed body from req: " <> result.unwrap(bit_array.to_string(expected), "Nil"))
   case crypto.secure_compare(value, expected) {
     True -> Ok(Nil)
     False -> Error(InvalidClaims)
