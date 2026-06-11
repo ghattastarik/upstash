@@ -109,7 +109,7 @@ fn verify_subject(
 
 fn verify_body(jwt: gwt.Jwt(a), body: String) -> Result(Nil, VerifyError) {
   use value <- result.try(
-    gwt.get_header_claim(jwt, "body", decode.run(_, decode.string))
+    gwt.get_payload_claim(jwt, "body", decode.string)
     |> result.map(bit_array.from_string)
     |> result.replace_error(InvalidClaims)
   )
@@ -118,7 +118,7 @@ fn verify_body(jwt: gwt.Jwt(a), body: String) -> Result(Nil, VerifyError) {
     body
     |> bit_array.from_string
     |> crypto.hash(crypto.Sha256, _)
-    |> bit_array.base64_url_encode(False)
+    |> bit_array.base64_url_encode(True)
     |> bit_array.from_string
 
   case crypto.secure_compare(value, expected) {
