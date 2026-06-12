@@ -43,11 +43,11 @@ pub type DispatchError {
 
 pub fn method_to_string(method: HttpMethod) -> String {
   case method {
-    Post -> "post"
-    Get -> "get"
-    Put -> "put"
-    Patch -> "patch"
-    Delete -> "delete"
+    Post -> "POST"
+    Get -> "GET"
+    Put -> "PUT"
+    Patch -> "PATCH"
+    Delete -> "DELETE"
   }
 }
 
